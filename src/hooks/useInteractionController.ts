@@ -1,20 +1,39 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 
-export const useInteractionController = () => {
+export const useInteractionController = (timeInSeconds: number) => {
 	const [height, setHeight] = useState<number>(0)
 	const [width, setWidth] = useState<number>(0)
 	const [isPaused, setIsPaused] = useState<boolean>(true)
 	const [screenIndex, setScreenIndex] = useState<number>(0)
+	const [currentIndex, setCurrentIndex] = useState<number>(0)
 
 	const [rightSideActualWidth, setRightSideActualWidth] = useState<number>(0)
 	const [gap, setGap] = useState<number>(0)
 
 	const [dynamicArray, setDynamicArray] = useState<Array<number>>([])
+	const delay = (timeInSeconds * 1000) / ((screenIndex + 1) * 50)
+	// console.log('amount of delay: ', delay)
 
 	const generateDynamicArray = (size: number, ini: number) => {
 		setDynamicArray(
 			Array.from({ length: size }, (v = 0, i: number = ini) => i++)
 		)
+	}
+
+	const wait = (time: number): Promise<any> => {
+		// console.log('time inside the wait function: ', time)
+
+		return new Promise((resolve, reject) => {
+			if (currentIndex <= (screenIndex + 1) * 50) {
+				resolve(
+					setTimeout(() => {
+						setCurrentIndex(currentIndex + 1)
+					}, time)
+				)
+			} else {
+				reject('out')
+			}
+		})
 	}
 
 	const indexingBasedOnScreenWidth = (h: number, w: number) => {
@@ -62,6 +81,15 @@ export const useInteractionController = () => {
 		window.addEventListener('resize', handleWindowResize)
 	}, [width])
 
+	useEffect(() => {
+		if (!isPaused) {
+			// console.log(timeInSeconds, delay)
+			wait(delay)
+				.then(() => console.log('looping'))
+				.catch((message) => console.log(message))
+		}
+	}, [isPaused, timeInSeconds, currentIndex])
+
 	return {
 		height,
 		width,
@@ -71,5 +99,6 @@ export const useInteractionController = () => {
 		gap,
 		screenIndex,
 		dynamicArray,
+		currentIndex,
 	}
 }

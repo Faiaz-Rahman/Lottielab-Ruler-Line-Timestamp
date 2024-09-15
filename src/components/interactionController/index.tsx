@@ -1,9 +1,12 @@
 import { faPause, faPlay } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useInteractionController } from '../../hooks/useInteractionController'
 
 const InteractionController = () => {
+	const [startingValue, setStartingValue] = useState<string>('0')
+	const [endingValue, setEndingValue] = useState<string>('1')
+
 	const {
 		height,
 		width,
@@ -13,12 +16,10 @@ const InteractionController = () => {
 		rightSideActualWidth,
 		gap,
 		screenIndex,
-	} = useInteractionController()
+		currentIndex,
+	} = useInteractionController(Number.parseInt(endingValue))
 	// console.log(height, width, rightSideActualWidth)
 	// console.log(dynamicArray)
-
-	const [startingValue, setStartingValue] = useState<string>('0')
-	const [endingValue, setEndingValue] = useState<string>('1')
 
 	const singleMark = (ind: number): React.JSX.Element => {
 		return (
@@ -104,11 +105,11 @@ const InteractionController = () => {
 				</div>
 			</div>
 
-			{/* right section */}
+			{/* right section =>  timestamp ruler*/}
 			<div
 				className="h-full w-5/6 
                 flex items-end pl-4 pr-4
-				bg-green-100
+				bg-green-100 relative transition-all
 				"
 			>
 				<div
@@ -123,6 +124,15 @@ const InteractionController = () => {
 					{dynamicArray.map((item, index) => {
 						return singleMark(index)
 					})}
+
+					<div
+						className="h-10 bg-red-500 w-[1px] absolute
+						left-4 transition-all
+					"
+						style={{
+							transform: `translateX(${(currentIndex + 1) * gap + 1}px)`,
+						}}
+					></div>
 				</div>
 			</div>
 		</div>
